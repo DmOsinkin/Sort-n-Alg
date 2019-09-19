@@ -3,7 +3,7 @@ package ru.dosinkin;
 public class MyArray {
     private int[] array;
     private int nElems;
-    private int maxId = -1;
+    private int maxValue = Integer.MIN_VALUE;
 
     public MyArray(int size) {
         nElems = 0;
@@ -19,10 +19,8 @@ public class MyArray {
 
     public void insert(int newElement) {
         this.array[nElems] = newElement;
+        maxValue = array[nElems] < newElement ? newElement : maxValue;
         nElems++;
-        if (maxId > -1 && array[maxId] < newElement) {
-            maxId = nElems;
-        }
     }
 
     private int findId(int leftEdge, int rightEdge, int newElement) {
@@ -44,15 +42,17 @@ public class MyArray {
     }
 
     public boolean delete(int element) {
-        for (int i = 0; i < nElems; i++) {
-            if (this.array[i] == element) {
-                if (this.nElems - 1 - i + 1 >= 0)
-                    System.arraycopy(this.array, i + 1, this.array, i + 1 - 1, this.nElems - 1 - i + 1);
-                nElems--;
-                return true;
-            }
+        int j;
+        for (j = 0; j < nElems; j++)
+            if (element == array[j])
+                break;
+        if (j == nElems)
+            return false;
+        else {
+            for (int k = j; k < nElems; k++) array[k] = array[k + 1];
+            nElems--;
+            return true;
         }
-        return false;
     }
 
     public void print() {
@@ -63,22 +63,36 @@ public class MyArray {
     }
 
     public int getMax() {
-        return maxId;
+        return maxValue;
     }
 
     public int removeMax() {
-        maxId = -1;
-        if(nElems == 0)
-            return maxId;
-        int maxValue = Integer.MIN_VALUE;
+        maxValue = Integer.MIN_VALUE;
+        if (nElems == 0)
+            return -1;
         for (int i = 0; i < nElems; i++) {
             if (array[i] > maxValue) {
-                maxId = i;
                 maxValue = array[i];
             }
         }
-        this.delete(maxValue);
-        return maxId;
+        delete(maxValue);
+        return maxValue;
+    }
+
+    public void choiceSort() {
+        int min;
+        int minId = -1;
+        for (int i = 0; i < nElems; i++) {
+            min = Integer.MAX_VALUE;
+            for (int j = i; j < nElems; j++) {
+                if (min > array[j]) {
+                    min = array[j];
+                    minId = j;
+                }
+            }
+            array[minId] = array[i];
+            array[i] = min;
+        }
     }
 
 
